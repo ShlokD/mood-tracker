@@ -1,0 +1,30 @@
+{
+  "name": "mood-tracker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint ./src/**/*.{js,jsx,ts,tsx} --fix",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "@shelacek/plotery": "^1.1.3",
+    "autoprefixer": "^10.4.21",
+    "dexie": "^4.0.11",
+    "preact": "^10.26.5",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^4.1.8",
+    "ulid": "^3.0.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.1",
+    "@tailwindcss/postcss": "^4.1.8",
+    "eslint": "^8.57.1",
+    "eslint-config-preact": "^1.5.0",
+    "jest": "^30.0.0",
+    "vite": "^6.3.5"
+  }
+}

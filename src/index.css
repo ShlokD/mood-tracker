@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+* {
+  font-family: "Lato", sans-serif;
+}
+
+html {
+  width: 100%;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
