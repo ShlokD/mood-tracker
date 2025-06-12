@@ -22,3 +22,8 @@ body {
 ::-webkit-scrollbar {
   display: none;
 }
+
+button,
+input {
+  cursor: pointer;
+}

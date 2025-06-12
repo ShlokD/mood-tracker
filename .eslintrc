@@ -1,3 +1,6 @@
 {
-  "extends": ["eslint-config-preact"]
+  "extends": ["eslint-config-preact"],
+  "globals": {
+    "vi": "true"
+  }
 }

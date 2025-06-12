@@ -1,10 +1,10 @@
 import { render } from "preact";
-import AppContextProvider from "./app-context.jsx";
-import { App } from "./app.jsx";
+import AppContextProvider from "./app-context";
+import App from "./app";
 import DBContextProvider from "./db-context";
 import "./index.css";
 
-const Application = () => {
+export const Application = () => {
   return (
     <DBContextProvider>
       <AppContextProvider>

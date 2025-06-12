@@ -1,11 +1,11 @@
-import { MOODS } from "./enums";
+import { MOODS } from "../enums";
 const MoodStats = ({ moods }) => {
-  const totalSleep = moods.reduce((avgSleep, mood) => {
+  const totalSleep = moods?.reduce((avgSleep, mood) => {
     avgSleep += mood.sleep;
     return avgSleep;
   }, 0);
 
-  const moodCounter = moods.reduce(
+  const moodCounter = moods?.reduce(
     (counter, mood) => {
       if (counter[mood.moodVal]) {
         counter[mood.moodVal] += 1;
