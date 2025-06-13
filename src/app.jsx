@@ -11,11 +11,12 @@ export default function App() {
 
   const {
     dummyMode,
-    setDummyMode,
+    toggleDummyMode,
     moods,
     addNewMood,
     addReflection,
     editMood,
+    deleteMoodData,
   } = useAppContext();
   const today = useRef(new Date());
   const todayMood = moods?.find((mood) => {
@@ -64,8 +65,6 @@ export default function App() {
   const showMoodLogger = () => {
     setShowLogger(true);
   };
-
-  const toggleDummyMode = () => setDummyMode((prev) => !prev);
 
   return (
     <div
@@ -120,6 +119,15 @@ export default function App() {
             <div className="my-2">
               <MoodStats moods={moods.slice(0, 5)} />
             </div>
+          )}
+
+          {!dummyMode && moods.length > 0 && (
+            <button
+              className="bg-blue-400 px-2 py-4 rounded-xl font-bold text-white"
+              onClick={deleteMoodData}
+            >
+              Delete Mood Data
+            </button>
           )}
 
           <div className="flex flex-col justify-center items-center">

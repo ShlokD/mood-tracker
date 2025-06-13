@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { useContext, useEffect, useState } from "preact/hooks";
+import { useContext, useEffect, useState, useRef } from "preact/hooks";
 const AppContext = createContext({});
 import { useDBContext } from "./db-context";
 import { ulid } from "ulid";
@@ -10,39 +10,70 @@ const randomInteger = (min, max) => {
 };
 
 const AppContextProvider = ({ children }) => {
-  const [dummyMode, setDummyMode] = useState(true);
+  const [dummyMode, setDummyMode] = useState(false);
   const [moods, setMoods] = useState(null);
-  const { loadMoodsFromStore, addMoodToStore, updateMoodInStore } =
-    useDBContext();
+  const {
+    loadMoodsFromStore,
+    addMoodToStore,
+    updateMoodInStore,
+    deleteMoodsFromStore,
+  } = useDBContext();
+
+  const dummyData = useRef([]);
+
+  const loadDataFromStore = async () => {
+    const data = await loadMoodsFromStore();
+    if (data.length > 0) {
+      setMoods(data);
+      return true;
+    }
+
+    return false;
+  };
+
+  const loadDummyData = () => {
+    const today = new Date();
+    const randomMoods = new Array(5).fill(0).map((_, i) => {
+      const d = new Date();
+      d.setDate(today.getDate() - i - 1);
+      return {
+        id: ulid(),
+        date: d.toISOString(),
+        moodVal: randomInteger(1, 5),
+        sleep: randomInteger(0, 12),
+        reflections: [],
+      };
+    });
+    dummyData.current = randomMoods;
+  };
 
   const loadData = async () => {
-    if (dummyMode) {
-      const today = new Date();
-      const randomMoods = new Array(5).fill(0).map((_, i) => {
-        const d = new Date();
-        d.setDate(today.getDate() - i - 1);
-        return {
-          id: ulid(),
-          date: d.toISOString(),
-          moodVal: randomInteger(1, 5),
-          sleep: randomInteger(0, 12),
-          reflections: [],
-        };
-      });
-      setMoods(randomMoods);
+    const fromStore = await loadDataFromStore();
+    if (fromStore) {
+      setDummyMode(false);
     } else {
-      const data = await loadMoodsFromStore();
-      if (data) {
-        setMoods(data);
-      } else {
-        setMoods([]);
-      }
+      setDummyMode(true);
+      setMoods(dummyData.current);
     }
   };
 
   useEffect(() => {
+    loadDummyData();
     loadData();
-  }, [dummyMode]);
+  }, []);
+
+  const toggleDummyMode = async () => {
+    if (dummyMode) {
+      const inStore = await loadDataFromStore();
+      if (!inStore) {
+        setMoods([]);
+      }
+      setDummyMode(false);
+    } else {
+      setMoods(dummyData.current);
+      setDummyMode(true);
+    }
+  };
 
   const addNewMood = async (mood) => {
     let update = true;
@@ -51,9 +82,13 @@ const AppContextProvider = ({ children }) => {
     }
     if (update) {
       setMoods((prev) => {
-        return [...prev, mood].sort((a, b) => {
+        const newMoods = [...prev, mood].sort((a, b) => {
           return new Date(b.date) - new Date(a.date);
         });
+        if (dummyMode) {
+          dummyData.current = newMoods;
+        }
+        return newMoods;
       });
     }
   };
@@ -68,7 +103,9 @@ const AppContextProvider = ({ children }) => {
         const newMoods = [...prev];
         const index = newMoods.findIndex((m) => m.id === updatedMood.id);
         newMoods[index] = updatedMood;
-        console.log(newMoods);
+        if (dummyMode) {
+          dummyData.current = newMoods;
+        }
         return newMoods;
       });
     }
@@ -95,9 +132,22 @@ const AppContextProvider = ({ children }) => {
             reflections: [...moodToEdit.reflections, reflection],
           };
           newMoods[index] = moodToEdit;
+          if (dummyMode) {
+            dummyData.current = newMoods;
+          }
         }
         return newMoods;
       });
+    }
+  };
+
+  const deleteMoodData = async () => {
+    try {
+      await deleteMoodsFromStore();
+      setMoods([]);
+      return true;
+    } catch (_) {
+      return false;
     }
   };
 
@@ -105,11 +155,12 @@ const AppContextProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         dummyMode,
-        setDummyMode,
         addNewMood,
         addReflection,
         editMood,
+        deleteMoodData,
         moods,
+        toggleDummyMode,
       }}
     >
       {children}

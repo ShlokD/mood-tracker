@@ -14,8 +14,12 @@ export const useDBContext = () => useContext(DBContext);
 
 const DBContextProvider = ({ children }) => {
   const loadMoodsFromStore = async () => {
-    const data = await db.moods.limit(5).toArray();
-    return data;
+    try {
+      const data = await db.moods.limit(5).toArray();
+      return data;
+    } catch (_) {
+      return [];
+    }
   };
 
   const addMoodToStore = async (mood) => {
@@ -29,16 +33,30 @@ const DBContextProvider = ({ children }) => {
 
   const updateMoodInStore = async (mood) => {
     try {
-      console.log("udpatedmood", { mood });
       await db.moods.put(mood);
       return true;
     } catch (_) {
       return false;
     }
   };
+
+  const deleteMoodsFromStore = async () => {
+    try {
+      await db.moods.clear();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
   return (
     <DBContext.Provider
-      value={{ loadMoodsFromStore, addMoodToStore, updateMoodInStore }}
+      value={{
+        loadMoodsFromStore,
+        addMoodToStore,
+        updateMoodInStore,
+        deleteMoodsFromStore,
+      }}
     >
       {children}
     </DBContext.Provider>
